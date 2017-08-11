@@ -124,15 +124,13 @@ rails generate channel Appearance
   # ...
 ```
 
-* lets try to make our GET index streamable and change the endpoint logic:
+* make endpoint streamable?
 
 ```ruby
-  # GET api/v1/users
-  def index
-    @users = User.all
-    if @users
-      ActionCable.server.broadcast 'appearance_channel', json_response(@users)
-    end
+  def update
+    @user = User.find(params[:id])
+    @user.update(user_params)
+    ActionCable.server.broadcast 'appearance_channel', json_response(@user)
   end
 ```
 
@@ -152,7 +150,7 @@ gem 'redis', '~> 3.0'
 ```
 bundle install
 heroku create
-herokue addons:create redistogo
+heroku addons:create redistogo
 heroku config | grep REDISTOGO_URL
 ```
 
@@ -168,9 +166,9 @@ production:
 # config/environments/production.rb
 
 
-  config.action_cable.url = 'wss://peaceful-basin-31856.herokuapp.com/cable'
+  config.action_cable.url = 'wss://ac-users-api.herokuapp.com/cable'
   config.action_cable.allowed_request_origins = [
-    'https://peaceful-basin-31856.herokuapp.com' ]
+    'https://ac-users-api.herokuapp.com' ]
 ```
 
 ```
@@ -183,5 +181,15 @@ heroku run rails db:seed
 ```
 
 ... onto the client?
+
+## React-Native Steps to Victory?
+
+```
+npm install --save react-actioncable-provider react-native-actioncable
+```
+
+
+
+
 
 
