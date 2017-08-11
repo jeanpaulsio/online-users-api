@@ -104,3 +104,84 @@ GET     /api/v1/users
 PUT     /api/v1/users/:id
 ```
 
+## SPOOKY ACTION CABLE WEB SOCKETS STUFF
+
+```
+rails generate channel Appearance
+```
+
+* Open up this stream and `stream_from` "appearance_channel"
+
+```ruby
+# app/channels/appearance_channel.rb
+
+  #...
+
+  def subscribed
+    stream_from "appearance_channel"
+  end
+
+  # ...
+```
+
+* lets try to make our GET index streamable and change the endpoint logic:
+
+```ruby
+  # GET api/v1/users
+  def index
+    @users = User.all
+    if @users
+      ActionCable.server.broadcast 'appearance_channel', json_response(@users)
+    end
+  end
+```
+
+* mount it in `config/routes`
+
+```ruby
+mount ActionCable.server, at: '/cable'
+```
+
+### Action Cable Deployment
+
+```ruby
+# Gemfile
+gem 'redis', '~> 3.0'
+```
+
+```
+bundle install
+heroku create
+herokue addons:create redistogo
+heroku config | grep REDISTOGO_URL
+```
+
+```ruby
+# config/cable.yml
+
+production:
+  adapter: redis
+  url: ${REDISTOGO_URL}
+```
+
+```ruby
+# config/environments/production.rb
+
+
+  config.action_cable.url = 'wss://peaceful-basin-31856.herokuapp.com/cable'
+  config.action_cable.allowed_request_origins = [
+    'https://peaceful-basin-31856.herokuapp.com' ]
+```
+
+```
+git add .
+git commit -m 'heroku prep'
+git push heroku master
+
+heroku run rails db:migrate
+heroku run rails db:seed
+```
+
+... onto the client?
+
+
