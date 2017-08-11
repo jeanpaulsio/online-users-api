@@ -241,7 +241,7 @@ $ heroku run rails db:seed
 
 ```
 $ cd online-users
-$ npm install --save axios react-actioncable-provider react-native-actioncable
+$ npm install --save axios react-native-actioncable
 ```
 
 * Open up `App.js` and let's do a simple fetch of our 3 seeded users
@@ -306,7 +306,6 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import axios from "axios";
 import ActionCable from "react-native-actioncable";
-import ActionCableProvider from "react-actioncable-provider";
 
 export default class App extends React.Component {
   state = {
@@ -335,14 +334,44 @@ export default class App extends React.Component {
     });
   }
 
-  render() { /* brevity is the soul of wit */ }
+  render() {
+    return (
+      <View style={styles.container}>
+        <Text style={{fontWeight: '600'}}>Users</Text>
+        {this.state.userList &&
+          this.state.userList.map(user => {
+            return (
+              <View key={user.id}>
+                <Text>
+                  {user.name}
+                  {user.online && <View style={styles.online} />}
+                </Text>
+              </View>
+            );
+          })}
+      </View>
+    );
+  }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  online: {
+    height: 8,
+    width: 8,
+    borderRadius: 4,
+    backgroundColor: "green"
+  }
+});
 
 ```
 
-SWEET
 
-We can test this out by sending patch requests via postman and watching our app update a user's online status in real time!
 
 
 
